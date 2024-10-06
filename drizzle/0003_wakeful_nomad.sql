@@ -1,0 +1,1 @@
+ALTER TABLE "conversations" ALTER COLUMN "id" SET DATA TYPE bigserial;

@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 20% 97%;
+    --foreground: 220 10% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 10% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 10% 10%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 220 14% 90%;
+    --secondary-foreground: 220 10% 10%;
+    --muted: 220 14% 90%;
+    --muted-foreground: 220 10% 40%;
+    --accent: 220 14% 90%;
+    --accent-foreground: 220 10% 10%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 221 83% 53%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 220 20% 10%;
+    --foreground: 220 10% 98%;
+    --card: 220 20% 13%;
+    --card-foreground: 220 10% 98%;
+    --popover: 220 20% 13%;
+    --popover-foreground: 220 10% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 220 10% 98%;
+    --secondary: 220 14% 18%;
+    --secondary-foreground: 220 10% 98%;
+    --muted: 220 14% 18%;
+    --muted-foreground: 220 10% 60%;
+    --accent: 220 14% 18%;
+    --accent-foreground: 220 10% 98%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 14% 22%;
+    --input: 220 14% 22%;
+    --ring: 217 91% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Keep the existing SVG and Mermaid styles */
+svg[id^="m"][width][height][viewBox] {
+  max-width: 95%;
+  max-height: 95%;
+}
+
+div.mermaid {
+  margin-left: 0 !important;
+  /* text-align: center; */
+  resize: both;
+  overflow: auto;
+  margin-bottom: 2px;
+  background-color: transparent;
+  position: relative;
+  width: 1000px;
+  height: auto;
+}
+
+/* .mermaid svg {
+  height: auto;
+  max-width: 100% !important;
+} */
