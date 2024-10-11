@@ -82,17 +82,10 @@ svg[id^="m"][width][height][viewBox] {
 
 div.mermaid {
   margin-left: 0 !important;
-  /* text-align: center; */
   resize: both;
   overflow: auto;
-  margin-bottom: 2px;
+  padding: 10px 10px 10px 10px;
   background-color: transparent;
   position: relative;
-  width: 1000px;
   height: auto;
 }
-
-/* .mermaid svg {
-  height: auto;
-  max-width: 100% !important;
-} */

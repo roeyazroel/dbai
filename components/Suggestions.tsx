@@ -11,14 +11,12 @@ import React from "react";
 interface SuggestionsProps {
   suggestions: string[];
   onSuggestionClick: (suggestion: string) => void;
-  toggleSuggestions: () => void;
   isInline?: boolean;
 }
 
 export const Suggestions: React.FC<SuggestionsProps> = ({
   suggestions,
   onSuggestionClick,
-  toggleSuggestions,
   isInline = false,
 }) => {
   if (isInline) {
@@ -51,7 +49,6 @@ export const Suggestions: React.FC<SuggestionsProps> = ({
           size="icon"
           variant="outline"
           className="mb-[1px]"
-          onClick={toggleSuggestions}
         >
           <Lightbulb className="h-4 w-4" />
         </Button>

@@ -101,7 +101,30 @@ export async function getConversationMessages(conversationId: number) {
     .where(eq(messages.conversationId, conversationId))
     .orderBy(asc(messages.createdAt));
 
-  return conversationMessages;
+  // Convert it to a list of distinct messages with an array of queries
+  const result = conversationMessages.reduce((acc: Message[], row) => {
+    const existingMessage = acc.find((m) => m.id === row.messages.id);
+    if (existingMessage) {
+      if (row.queries) {
+        existingMessage.queries = [
+          ...(existingMessage.queries || []),
+          row.queries,
+        ];
+      }
+    } else {
+      acc.push({
+        id: row.messages.id,
+        conversationId: row.messages.conversationId,
+        content: row.messages.content,
+        role: row.messages.role,
+        createdAt: row.messages.createdAt,
+        queries: row.queries ? [row.queries] : [],
+      });
+    }
+    return acc;
+  }, []);
+
+  return result;
 }
 
 export async function addMessage(

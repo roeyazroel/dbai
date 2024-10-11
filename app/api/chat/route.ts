@@ -2,7 +2,6 @@ import {
   addMessage,
   addQuery,
   getConversationMessages,
-  Message,
 } from "@/lib/conversations";
 import { executeQuery, getKnowledgeBase } from "@/lib/source";
 import { openai } from "@ai-sdk/openai";
@@ -31,7 +30,7 @@ export async function POST(req: NextRequest) {
 
   const newMessage = messages[messages.length - 1];
   // check if message is not empty
-  let message: Message;
+  let message: any;
   if (
     newMessage.content &&
     newMessage.content !== "" &&
@@ -44,10 +43,10 @@ export async function POST(req: NextRequest) {
     );
   } else {
     // get the last message from the existing messages
-    const userMessages = (
-      await getConversationMessages(parseInt(conversationId))
-    ).filter((m) => m.messages.role === "user");
-    message = userMessages[userMessages.length - 1].messages;
+    const userLatestMessage = existingMessages
+      .filter((m) => m.role === "user")
+      .pop();
+    message = userLatestMessage || { content: "", role: "user" };
   }
 
   const result = await streamText({
@@ -55,8 +54,8 @@ export async function POST(req: NextRequest) {
     messages: [
       ...convertToCoreMessages(
         existingMessages.map((m) => ({
-          role: m.messages.role as "user" | "assistant" | "system",
-          content: m.messages.content,
+          role: m.role as "user" | "assistant" | "system",
+          content: m.content,
         }))
       ),
       ...convertToCoreMessages(messages),
@@ -195,6 +194,7 @@ export async function POST(req: NextRequest) {
       }),
       executeQuery: tool({
         description: `Execute the generated SQL query and return the results,
+        ONLY ONE QUERY AT A TIME.
         Please make sure to use the mermaid format correctly, it must be started with "\`\`\`mermaid" and ended with "\`\`\`".
         Only one mermaid chart is allowed per response.`,
         parameters: z.object({

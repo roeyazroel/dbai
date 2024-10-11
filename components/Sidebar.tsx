@@ -94,7 +94,7 @@ export default function Sidebar() {
               >
                 <item.icon className="h-5 w-5 mr-3" />
                 <span>{item.label}</span>
-                <ChevronRight className="h-4 w-4 ml-auto" />
+                {/* <ChevronRight className="h-4 w-4 ml-auto" /> */}
               </motion.div>
             </Link>
           </li>

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
+import Loading from "@/app/loading";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useConversation } from "@/contexts/ConversationContext";
@@ -11,36 +12,33 @@ import {
   getConversation,
   getConversationMessages,
   Message,
-  Query,
 } from "@/lib/conversations";
 import { useChat } from "ai/react";
-import { Loader2, Plus, Send } from "lucide-react";
+import { Plus, Send } from "lucide-react";
+import mermaid from "mermaid";
 import { useParams, useRouter } from "next/navigation";
 import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
-import { MessageComponent } from "./MessageComponent";
+import { MessageList } from "./MessageComponent";
 import { Suggestions } from "./Suggestions";
 
 export default function Chat() {
   const { toast } = useToast();
   const pathParams = useParams();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [currentConversationId, setCurrentConversationId] = useState<
     number | null
   >(null);
   const [currentConversation, setCurrentConversation] =
     useState<Conversation | null>(null);
   const router = useRouter();
-  const {
-    conversations,
-    refreshConversations,
-    suggestions,
-    isSuggestionsLoading,
-  } = useConversation();
+  const { refreshConversations, suggestions, isSuggestionsLoading } =
+    useConversation();
   const [isLoading, setIsLoading] = useState(true);
   const [conversationMessages, setConversationMessages] = useState<Message[]>(
     []
   );
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const lastMessageRef = useRef<HTMLDivElement>(null);
 
   const {
     messages,
@@ -103,19 +101,23 @@ export default function Chat() {
 
       setMessages(
         conversationMessages.map((msg) => ({
-          id: msg.messages.id.toString(),
-          content: msg.messages.content,
-          role: msg.messages.role as "user" | "assistant",
+          id: msg.id.toString(),
+          content: msg.content,
+          role: msg.role as "user" | "assistant",
         }))
       );
       setConversationMessages(
         conversationMessages.map((msg) => ({
-          id: Number(msg.messages.id),
-          content: msg.messages.content,
-          role: msg.messages.role as "user" | "assistant",
-          conversationId: Number(msg.messages.conversationId),
-          createdAt: msg.messages.createdAt,
-          queries: msg.queries ? [msg.queries] : [],
+          id: Number(msg.id),
+          content: msg.content,
+          role: msg.role as "user" | "assistant",
+          conversationId: Number(msg.conversationId),
+          createdAt: msg.createdAt,
+          queries: msg.queries
+            ? Array.isArray(msg.queries)
+              ? msg.queries
+              : [msg.queries]
+            : [],
         }))
       );
     } catch (error) {
@@ -131,20 +133,22 @@ export default function Chat() {
   };
 
   const scrollToBottom = useCallback(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
-    }
+    mermaid.initialize({ startOnLoad: true, theme: "dark" });
+    setTimeout(() => {
+      if (lastMessageRef.current) {
+        lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 500); // Add a small delay
   }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, scrollToBottom]);
+  }, [conversationMessages, scrollToBottom]);
 
   const handleTextareaChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       handleInputChange(e);
-      adjustTextareaHeight(e.target);
+      adjustTextareaHeight(e.target as HTMLTextAreaElement);
     },
     [handleInputChange]
   );
@@ -158,11 +162,26 @@ export default function Chat() {
     (e: KeyboardEvent<HTMLTextAreaElement>) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
         e.preventDefault();
-        handleSubmit(e as never);
+        adjustTextareaHeight(e.target as HTMLTextAreaElement);
+        sendMessage(input);
       }
     },
-    [handleSubmit]
+    [input]
   );
+
+  const sendMessage = async (message: string) => {
+    setConversationMessages([
+      ...conversationMessages,
+      {
+        id: conversationMessages.length + 1,
+        content: message,
+        role: "user",
+        conversationId: currentConversationId as number,
+        createdAt: new Date(),
+      },
+    ]);
+    handleSubmit(message as never);
+  };
 
   const handleCreateNewConversation = async () => {
     const newConversation = await createConversation("New Conversation");
@@ -176,7 +195,6 @@ export default function Chat() {
       const textarea = chatContainerRef.current.querySelector("textarea");
       if (textarea) {
         textarea.focus();
-        adjustTextareaHeight(textarea);
       }
     }
   };
@@ -186,12 +204,8 @@ export default function Chat() {
     handleSubmit(e);
   };
 
-  const toggleSuggestions = () => {
-    // This function can be left empty or removed if not needed elsewhere
-  };
-
   if (isLoading) {
-    return <Loader />;
+    return <Loading />;
   }
 
   if (!currentConversation) {
@@ -217,40 +231,29 @@ export default function Chat() {
         className="flex-grow overflow-y-auto p-4 space-y-4"
       >
         {conversationMessages.length === 0 ? (
-          <MessageComponent
-            key={0}
-            message={{
-              id: 0,
-              content: "Hello, How can I help you?",
-              role: "assistant",
-              conversationId: 0,
-              createdAt: new Date(),
-            }}
+          <MessageList
+            messages={[
+              {
+                id: 0,
+                content: "Hello, How can I help you?",
+                role: "assistant",
+                conversationId: 0,
+                createdAt: new Date(),
+              },
+            ]}
           />
         ) : (
-          conversationMessages.map((message) => (
-            <MessageComponent
-              key={message.id}
-              message={{
-                id: Number(message.id),
-                content: message.content,
-                role: message.role,
-                conversationId: currentConversationId as number,
-                createdAt: message.createdAt as Date,
-              }}
-              queries={message.queries as Query[]}
-            />
-          ))
+          <MessageList
+            messages={conversationMessages}
+            lastMessageRef={lastMessageRef}
+          />
         )}
         {isChatLoading && <LoadingMessage />}
-        <div ref={messagesEndRef} />
       </div>
-      <form
-        onSubmit={handleFormSubmit}
-        className="p-4 border-t border-border"
-      >
-        <div className="flex items-end space-x-2">
+      <form onSubmit={handleFormSubmit} className="p-4 border-t border-border">
+        <div className="flex items-center space-x-2">
           <Textarea
+            ref={textareaRef}
             className="flex-grow bg-secondary text-secondary-foreground min-h-[2.5rem] max-h-[10rem] resize-none rounded-lg"
             value={input}
             onChange={handleTextareaChange}
@@ -258,19 +261,27 @@ export default function Chat() {
             placeholder="Type your message... (Cmd/Ctrl + Enter to send)"
             rows={1}
             disabled={isChatLoading}
+            onInput={(e) => {
+              const target = e.target as HTMLTextAreaElement;
+              target.style.height = "0px";
+              target.style.height = target.scrollHeight + "px";
+            }}
           />
           {!isSuggestionsLoading && (
             <Suggestions
               suggestions={suggestions}
               onSuggestionClick={handleSuggestionClick}
-              toggleSuggestions={toggleSuggestions}
+              // toggleSuggestions prop has been removed
             />
           )}
           <Button
             type="submit"
             size="icon"
             className="mb-[1px] bg-primary text-primary-foreground rounded-full"
-            disabled={isChatLoading}
+            disabled={isChatLoading || input.length === 0}
+            onClick={() => {
+              sendMessage(input);
+            }}
           >
             <Send className="h-4 w-4" />
           </Button>
@@ -282,7 +293,6 @@ export default function Chat() {
           <Suggestions
             suggestions={suggestions}
             onSuggestionClick={handleSuggestionClick}
-            toggleSuggestions={toggleSuggestions}
             isInline={true}
           />
         )}
@@ -299,12 +309,5 @@ export const LoadingMessage = () => (
         <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-200"></div>
       </div>
     </div>
-  </div>
-);
-
-export const Loader = () => (
-  <div className="flex justify-center items-center h-full">
-    <Loader2 className="animate-spin duration-10000 rounded-full size-4 border-t-2 border-b-2 border-primary" />
-    <p className="text-muted-foreground ml-2">Loading...</p>
   </div>
 );
