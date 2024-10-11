@@ -14,10 +14,6 @@ import { z } from "zod";
 export const maxDuration = 30;
 
 export async function POST(req: NextRequest) {
-  // if (!user) {
-  //   return new Response("Unauthorized", { status: 401 });
-  // }
-
   // extract orgId from request query params
   const { searchParams } = req.nextUrl;
   const conversationId = searchParams.get("conversationId");
@@ -36,7 +32,11 @@ export async function POST(req: NextRequest) {
   const newMessage = messages[messages.length - 1];
   // check if message is not empty
   let message: Message;
-  if (newMessage.content && newMessage.content !== "") {
+  if (
+    newMessage.content &&
+    newMessage.content !== "" &&
+    newMessage.role === "user"
+  ) {
     message = await addMessage(
       parseInt(conversationId),
       newMessage.content,
@@ -44,9 +44,10 @@ export async function POST(req: NextRequest) {
     );
   } else {
     // get the last message from the existing messages
-    message = (await getConversationMessages(parseInt(conversationId)))[
-      existingMessages.length - 1
-    ].messages;
+    const userMessages = (
+      await getConversationMessages(parseInt(conversationId))
+    ).filter((m) => m.messages.role === "user");
+    message = userMessages[userMessages.length - 1].messages;
   }
 
   const result = await streamText({

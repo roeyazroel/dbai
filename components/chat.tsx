@@ -211,7 +211,7 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex flex-col h-full rounded-lg">
+    <div className="flex flex-col h-full rounded-lg bg-card shadow-sm">
       <div
         ref={chatContainerRef}
         className="flex-grow overflow-y-auto p-4 space-y-4"
@@ -247,11 +247,11 @@ export default function Chat() {
       </div>
       <form
         onSubmit={handleFormSubmit}
-        className="p-4 border-t dark:border-gray-700"
+        className="p-4 border-t border-border"
       >
         <div className="flex items-end space-x-2">
           <Textarea
-            className="flex-grow dark:bg-gray-700 dark:text-white min-h-[2.5rem] max-h-[10rem] resize-none"
+            className="flex-grow bg-secondary text-secondary-foreground min-h-[2.5rem] max-h-[10rem] resize-none rounded-lg"
             value={input}
             onChange={handleTextareaChange}
             onKeyDown={handleKeyDown}
@@ -269,7 +269,7 @@ export default function Chat() {
           <Button
             type="submit"
             size="icon"
-            className="mb-[1px]"
+            className="mb-[1px] bg-primary text-primary-foreground rounded-full"
             disabled={isChatLoading}
           >
             <Send className="h-4 w-4" />
@@ -292,11 +292,11 @@ export default function Chat() {
 
 export const LoadingMessage = () => (
   <div className="flex justify-start">
-    <div className="max-w-[80%] p-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-black dark:text-white">
+    <div className="max-w-[80%] p-3 rounded-lg bg-secondary text-secondary-foreground">
       <div className="flex space-x-2">
-        <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-        <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-100"></div>
-        <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-200"></div>
+        <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+        <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-100"></div>
+        <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-200"></div>
       </div>
     </div>
   </div>
@@ -304,7 +304,7 @@ export const LoadingMessage = () => (
 
 export const Loader = () => (
   <div className="flex justify-center items-center h-full">
-    <Loader2 className="animate-spin duration-10000 rounded-full size-4 border-t-2 border-b-2 border-gray-900" />
-    <p className="text-gray-500">Loading...</p>
+    <Loader2 className="animate-spin duration-10000 rounded-full size-4 border-t-2 border-b-2 border-primary" />
+    <p className="text-muted-foreground ml-2">Loading...</p>
   </div>
 );

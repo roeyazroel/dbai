@@ -84,25 +84,25 @@ export default function TableStorePage() {
   }
 
   return (
-    <div className="h-full">
-      <div className="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">
+    <div className="h-full p-6">
+      <div className="bg-card rounded-lg shadow-sm p-6 mb-8">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
-            <Database className="h-8 w-8 text-blue-400 mr-3" />
-            <h2 className="text-xl font-semibold text-gray-100">
+            <Database className="h-8 w-8 text-primary mr-3" />
+            <h2 className="text-2xl font-semibold text-foreground">
               Manage Your Database Tables
             </h2>
           </div>
           <button
             onClick={handleGenerateDescriptions}
             disabled={generating}
-            className="flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+            className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 disabled:opacity-50 transition-colors duration-200"
           >
             <RefreshCw className="h-5 w-5 mr-2" />
             {generating ? "Generating..." : "Generate Descriptions"}
           </button>
         </div>
-        <p className="text-gray-300 mb-6">
+        <p className="text-muted-foreground mb-6">
           Here you can manage your database tables and edit column descriptions.
           Click on the edit icon to modify a column's description or use the
           "Generate Descriptions" button to automatically generate descriptions

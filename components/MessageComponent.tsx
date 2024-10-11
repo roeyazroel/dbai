@@ -19,19 +19,21 @@ export const MessageComponent = memo(
           const mermaid = (await import("mermaid")).default;
           mermaid.initialize({ startOnLoad: true, theme: "dark" });
 
-          const diagrams = mermaidRef.current.querySelectorAll(".mermaid");
-          diagrams.forEach(async (diagram, index) => {
-            try {
-              const id = `mermaid-${index}`;
-              const { svg } = await mermaid.render(
-                id,
-                diagram.textContent || ""
-              );
-              diagram.innerHTML = svg;
-            } catch (error) {
-              console.error("Error rendering Mermaid diagram:", error);
-            }
-          });
+          const diagrams = mermaidRef.current?.querySelectorAll(".mermaid");
+          if (diagrams) {
+            diagrams.forEach(async (diagram, index) => {
+              try {
+                const id = `mermaid-${index}-${message.id}`;
+                const { svg } = await mermaid.render(
+                  id,
+                  diagram.textContent || ""
+                );
+                diagram.innerHTML = svg;
+              } catch (error) {
+                console.error("Error rendering Mermaid diagram:", error);
+              }
+            });
+          }
         }
       };
 
@@ -45,18 +47,22 @@ export const MessageComponent = memo(
     return (
       <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-4`}>
         {!isUser && (
-          <Avatar className="mr-2 bg-primary text-primary-foreground">
+          <Avatar className="bg-secondary text-secondary-foreground mr-2">
             <AvatarFallback>
               <Bot size={20} />
             </AvatarFallback>
           </Avatar>
         )}
-        <Card className={`max-w-[80%] ${isUser ? "bg-blue-500" : ""}`}>
+        <Card
+          className={`max-w-[80%] ${
+            isUser ? "bg-primary" : "bg-secondary"
+          } shadow-sm`}
+        >
           <CardContent className="p-3">
             <div
               ref={mermaidRef}
               className={`${
-                isUser ? "text-white" : "text-black dark:text-white"
+                isUser ? "text-primary-foreground" : "text-secondary-foreground"
               }`}
             >
               <ReactMarkdown

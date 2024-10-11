@@ -39,19 +39,19 @@ export default function DatabaseTable({ name, columns: initialColumns }: Databas
   }
 
   return (
-    <Card className="mb-8">
+    <Card className="mb-8 shadow-sm">
       <CardHeader>
-        <CardTitle>{name}</CardTitle>
+        <CardTitle className="text-xl font-semibold">{name}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Column Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="font-semibold">Column Name</TableHead>
+                <TableHead className="font-semibold">Type</TableHead>
+                <TableHead className="font-semibold">Description</TableHead>
+                <TableHead className="font-semibold">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -65,7 +65,7 @@ export default function DatabaseTable({ name, columns: initialColumns }: Databas
                         type="text"
                         value={editedDescription}
                         onChange={(e) => setEditedDescription(e.target.value)}
-                        className="w-full bg-gray-700 text-gray-100 rounded px-2 py-1"
+                        className="w-full bg-secondary text-secondary-foreground rounded-md px-2 py-1"
                       />
                     ) : (
                       column.description
@@ -76,13 +76,13 @@ export default function DatabaseTable({ name, columns: initialColumns }: Databas
                       <div className="flex space-x-2">
                         <button
                           onClick={() => handleSave(index)}
-                          className="text-green-400 hover:text-green-300"
+                          className="text-green-500 hover:text-green-600"
                         >
                           <Save size={18} />
                         </button>
                         <button
                           onClick={handleCancel}
-                          className="text-red-400 hover:text-red-300"
+                          className="text-red-500 hover:text-red-600"
                         >
                           <X size={18} />
                         </button>
@@ -90,7 +90,7 @@ export default function DatabaseTable({ name, columns: initialColumns }: Databas
                     ) : (
                       <button
                         onClick={() => handleEdit(index)}
-                        className="text-blue-400 hover:text-blue-300"
+                        className="text-primary hover:text-primary/80"
                       >
                         <Edit2 size={18} />
                       </button>
