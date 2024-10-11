@@ -2,14 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { ConversationContext } from "@/contexts/ConversationContext";
 import {
   createConversation,
   deleteConversation,
   renameConversation,
 } from "@/lib/conversations";
-import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import {
   ChevronRight,
@@ -70,78 +68,59 @@ export default function Sidebar() {
   };
 
   return (
-    <nav className="w-64 bg-gradient-to-br from-primary/10 via-secondary/10 to-background text-card-foreground shadow-lg flex flex-col h-full">
+    <nav className="w-64 bg-gradient-to-r from-primary/20 to-secondary/20 text-card-foreground shadow-lg flex flex-col h-full">
       <div className="p-6 justify-center items-center w-full">
         <h1 className="text-4xl font-extrabold text-primary text-center relative">
-          <span className="absolute top-0 left-0 w-full h-full bg-primary/5 filter blur-md rounded-full"></span>
+          <span className="absolute top-0 left-0 w-full h-full filter blur-sm"></span>
           {["D", "B", "A", "I"].map((char, index) => (
-            <motion.span
-              key={index}
-              className="inline-block relative z-10"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
+            <span key={index} className="inline-block relative z-10">
               {char}
-            </motion.span>
+            </span>
           ))}
         </h1>
       </div>
-      <ScrollArea className="flex-grow">
-        <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
-            Navigation
-          </h2>
-          <div className="space-y-1">
-            {navItems.map((item) => (
-              <Link key={item.href} href={item.href} className="block">
-                <motion.div
-                  className={cn(
-                    "flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
-                    pathname === item.href
-                      ? "bg-accent text-accent-foreground"
-                      : "transparent"
-                  )}
-                  whileHover={{ x: 5 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <item.icon className="mr-2 h-4 w-4" />
-                  <span>{item.label}</span>
-                  <ChevronRight className="ml-auto h-4 w-4 opacity-50" />
-                </motion.div>
-              </Link>
-            ))}
-          </div>
-        </div>
-        <div className="px-3 py-2">
-          <div className="flex items-center justify-between px-4">
-            <h2 className="text-lg font-semibold tracking-tight">
+      <ul className="mt-6 flex-grow overflow-y-auto">
+        {navItems.map((item) => (
+          <li key={item.href}>
+            <Link href={item.href} className="relative block">
+              <motion.div
+                className={`flex items-center px-6 py-3 ${
+                  pathname === item.href
+                    ? "text-primary bg-secondary"
+                    : "text-muted-foreground hover:text-card-foreground hover:bg-secondary/50"
+                } rounded-md mx-2 transition-colors`}
+                whileHover={{ x: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <item.icon className="h-5 w-5 mr-3" />
+                <span>{item.label}</span>
+                <ChevronRight className="h-4 w-4 ml-auto" />
+              </motion.div>
+            </Link>
+          </li>
+        ))}
+        <li className="px-6 py-4">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-semibold text-card-foreground">
               Conversations
             </h2>
             <Button
               size="icon"
               variant="ghost"
-              className="h-8 w-8 text-muted-foreground hover:text-card-foreground"
+              className="p-1 size-6 text-muted-foreground hover:text-card-foreground"
               onClick={handleCreateConversation}
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="size-4" />
             </Button>
           </div>
-          <div className="mt-2 space-y-1">
+          <ul className="space-y-2">
             {conversations.map((conv) => (
-              <motion.div
+              <li
                 key={conv.id}
-                className={cn(
-                  "flex items-center justify-between rounded-md px-3 py-2 text-sm",
-                  pathname === `/chat/${conv.id}`
-                    ? "bg-accent text-accent-foreground"
-                    : "hover:bg-accent/50"
-                )}
-                whileHover={{ x: 5 }}
-                transition={{ type: "spring", stiffness: 300 }}
+                className="flex flex-row items-center justify-between cursor-pointer hover:bg-secondary/50 rounded-md p-2 transition-colors"
                 onClick={() => handleConversationClick(conv.id)}
               >
-                <div className="flex-grow truncate">
+                <div className="flex-grow">
                   {editingId === conv.id ? (
                     <Input
                       value={newTitle}
@@ -150,43 +129,45 @@ export default function Sidebar() {
                       onKeyPress={(e) =>
                         e.key === "Enter" && handleRenameConversation(conv.id)
                       }
-                      className="h-7 px-2 py-1 text-sm"
+                      className="w-full"
                       onClick={(e) => e.stopPropagation()}
                     />
                   ) : (
-                    <span>{conv.title}</span>
+                    <span className="truncate text-card-foreground">
+                      {conv.title}
+                    </span>
                   )}
                 </div>
-                <div className="flex space-x-1 ml-2">
+                <div className="flex flex-row space-x-1 ml-2 flex-shrink-0">
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-7 w-7 text-muted-foreground hover:text-card-foreground"
+                    className="p-1 size-6 text-muted-foreground hover:text-card-foreground"
                     onClick={(e) => {
                       e.stopPropagation();
                       setEditingId(conv.id);
                       setNewTitle(conv.title);
                     }}
                   >
-                    <Edit2 className="h-3 w-3" />
+                    <Edit2 className="size-3" />
                   </Button>
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                    className="p-1 size-6 text-muted-foreground hover:text-destructive"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDeleteConversation(conv.id);
                     }}
                   >
-                    <Trash2 className="h-3 w-3" />
+                    <Trash2 className="size-3" />
                   </Button>
                 </div>
-              </motion.div>
+              </li>
             ))}
-          </div>
-        </div>
-      </ScrollArea>
+          </ul>
+        </li>
+      </ul>
     </nav>
   );
 }
